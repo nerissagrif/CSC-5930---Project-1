@@ -12,7 +12,7 @@ print 'Server listening....'
 
 while True:
     conn, addr = s.accept()     # Establish connection with client.
-    print 'Got connection from', addr
+    print 'Got connection from', addrs
     data = conn.recv(1024)
     print('Server received', repr(data))
 
@@ -23,6 +23,17 @@ while True:
        conn.send(l)
        print('Sent ',repr(l))
        l = f.read(1024)
+
+    # Decrypt file with AES 
+    key = b'Sixteen byte key'
+    cipher = AES.new(key, AES.MODE_EAX, nonce=nonce)
+    plaintext = cipher.decrypt(ciphertext)
+    try:
+        cipher.verify(tag)
+        print("The message is authentic:", plaintext)
+    except ValueError:
+        print("Key incorrect or message corrupted")
+
     f.close()
 
     print('Done sending')
